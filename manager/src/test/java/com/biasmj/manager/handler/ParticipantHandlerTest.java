@@ -51,9 +51,7 @@ class ParticipantHandlerTest {
     void sendMessage() {
         String message = "Test message";
 
-        Assertions.assertDoesNotThrow(() -> {
-            participantHandler.sendMessage(message);
-        }, "sendMessage should not throw IOException");
+        Assertions.assertDoesNotThrow(() -> participantHandler.sendMessage(message), "sendMessage should not throw IOException");
     }
 
 }
