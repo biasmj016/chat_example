@@ -7,7 +7,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.io.IOException;
 
 public class ManagerChatGUI extends JFrame implements ChatObserver {
     private static final String INITIAL_MESSAGE = "Admin joined the chat.";
