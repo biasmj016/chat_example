@@ -13,27 +13,29 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public sealed interface ManageChat permits ManageChat.ManageChatService {
-    void startServer(int port) throws IOException;
+    void startServer(int port, String ipAddress) throws IOException;
+    void stopServer() throws IOException;
     void broadcast(String message);
     void addObserver(ChatObserver observer);
     void removeObserver(ChatObserver observer);
 
     final class ManageChatService implements ManageChat {
-        private static final Logger logger = Logger.getLogger(ManageChatService.class.getName());
+        private static final Logger logger = Logger.getLogger(ManageChat.class.getName());
         private ServerSocket serverSocket;
         private final List<ChatObserver> chatObservers = new CopyOnWriteArrayList<>();
 
         @Override
-        public void startServer(int port) throws IOException {
-            serverSocket = new ServerSocket(port);
-            logger.info("Chat started on " + InetAddress.getLocalHost() + " : " + port);
+        public void startServer(int port, String ipAddress) throws IOException {
+            InetAddress inetAddress = InetAddress.getByName(ipAddress);
+            serverSocket = new ServerSocket(port, 50, inetAddress);
+            logger.info("Manager Chat started on " + inetAddress + " : " + port);
 
             new Thread(() -> {
                 while (!Thread.currentThread().isInterrupted() && !serverSocket.isClosed()) {
                     try {
                         Socket socket = serverSocket.accept();
                         logger.info("Participant connected from " + socket.getRemoteSocketAddress());
-                        ParticipantHandler participantHandler = new ParticipantHandler(socket);
+                        ParticipantHandler participantHandler = new ParticipantHandler(socket, "admin");
                         addObserver(participantHandler);
                         participantHandler.start();
                     } catch (IOException e) {
@@ -45,8 +47,14 @@ public sealed interface ManageChat permits ManageChat.ManageChatService {
             }).start();
         }
 
+        @Override
         public void stopServer() throws IOException {
             if (serverSocket != null && !serverSocket.isClosed()) serverSocket.close();
+        }
+
+        @Override
+        public void broadcast(String message) {
+            chatObservers.forEach(observer -> observer.update(message));
         }
 
         @Override
@@ -59,10 +67,6 @@ public sealed interface ManageChat permits ManageChat.ManageChatService {
             chatObservers.remove(observer);
         }
 
-        @Override
-        public void broadcast(String message) {
-            chatObservers.forEach(observer -> observer.update(message));
-        }
         public ServerSocket getServerSocket() {
             return serverSocket;
         }
