@@ -7,6 +7,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.net.InetAddress;
 
 public class ManagerChatGUI extends JFrame implements ChatObserver {
     private static final String INITIAL_MESSAGE = "Admin joined the chat.";
@@ -28,7 +29,8 @@ public class ManagerChatGUI extends JFrame implements ChatObserver {
 
     private void initializeChatServer(int port) {
         try {
-            manageChat.startServer(port);
+            String localIpAddress = InetAddress.getLocalHost().getHostAddress();
+            manageChat.startServer(port, localIpAddress);
             manageChat.addObserver(this);
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Error starting server: " + e.getMessage(),
