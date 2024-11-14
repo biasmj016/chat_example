@@ -1,5 +1,6 @@
 package com.biasmj.server.chat.application.handler;
 
+import com.biasmj.server.chat.application.ChatServer;
 import com.biasmj.server.chat.application.usecase.*;
 import com.biasmj.server.chat.application.request.ChatCreateRequest;
 import com.biasmj.server.chat.application.request.ChatJoinRequest;

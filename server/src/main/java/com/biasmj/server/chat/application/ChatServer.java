@@ -1,4 +1,4 @@
-package com.biasmj.server.chat.domain;
+package com.biasmj.server.chat.application;
 
 import com.biasmj.server.chat.application.usecase.InitChatData;
 import com.biasmj.server.chat.application.handler.ThreadHandler;

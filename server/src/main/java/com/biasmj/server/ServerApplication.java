@@ -1,6 +1,6 @@
 package com.biasmj.server;
 
-import com.biasmj.server.chat.domain.ChatServer;
+import com.biasmj.server.chat.application.ChatServer;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
