@@ -38,7 +38,7 @@ class LeaveChatTest {
 
         assertNotNull(result);
         assertEquals(1, result.participants().size());
-        assertEquals("managerID", result.participants().get(0).id());
+        assertEquals("managerID", result.participants().get(0).participantID());
         verify(chatDao, times(1)).updateChat(any(Chat.class));
     }
 

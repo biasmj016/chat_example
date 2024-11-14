@@ -78,7 +78,7 @@ public class ThreadHandler extends Thread {
                 participant = loginParticipant.execute(loginReq);
                 ChatJoinRequest request = new ChatJoinRequest(message);
                 chat = joinChat.execute(request.toUsecase());
-                sendMessage(new ChatMessageResponse(ChatType.JOIN, chat.name(), participant.id(), participant.formatJoinMessage()));
+                sendMessage(new ChatMessageResponse(ChatType.JOIN, chat.name(), participant.participantID(), participant.formatJoinMessage()));
                 sendMessage(new ParticipantInitDataResponse(chat.participants()));
             }
             case CREATE -> {

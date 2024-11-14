@@ -23,7 +23,7 @@ public class ParticipantInitDataResponse extends MessageType {
     public String toString() {
         String str = super.getTypeName()+ ":";
         str += participantList.stream()
-                .map(Participant::id)
+                .map(Participant::participantID)
                 .collect(Collectors.joining(","));
         return str;
     }

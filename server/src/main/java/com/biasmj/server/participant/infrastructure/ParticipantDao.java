@@ -23,7 +23,7 @@ public interface ParticipantDao {
         @Override
         public Participant findParticipant(String participantId) {
             return participants.stream()
-                    .filter(participant -> participant.id().equals(participantId))
+                    .filter(participant -> participant.participantID().equals(participantId))
                     .findAny()
                     .orElseThrow(() -> new NoSuchElementException("Participant not found"));
         }
@@ -31,7 +31,7 @@ public interface ParticipantDao {
         @Override
         public boolean isExist(String participantId) {
             return participants.stream()
-                    .anyMatch(participant -> participant.id().equals(participantId));
+                    .anyMatch(participant -> participant.participantID().equals(participantId));
         }
     }
 }

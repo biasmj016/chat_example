@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 
 public record Participant(
         Socket socket,
-        String id,
+        String participantID,
         Boolean isManager,
         LocalDateTime loginDate
 ) {
@@ -14,10 +14,10 @@ public record Participant(
     }
 
     public String formatJoinMessage() {
-        return id + " joined the chat.";
+        return participantID + " joined the chat.";
     }
 
     public String formatLeaveMessage() {
-        return id + " left the chat.";
+        return participantID + " left the chat.";
     }
 }

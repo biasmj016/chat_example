@@ -27,7 +27,7 @@ public interface JoinChat {
 
         @Override
         public Chat execute(JoinChatRequest request) {
-            logger.log(Level.INFO, String.format("Participant(%s) is joining chat(%s)", request.participantId, request.chatName));
+            logger.log(Level.INFO, String.format("Participant(%s) is joining chat(%s)", request.participantID, request.chatName));
 
             Chat chat = chatDao.findChat(request.chatName);
             if (chat.isFull()) {
@@ -35,11 +35,11 @@ public interface JoinChat {
                 throw new IllegalArgumentException( "The chat room is currently full.");
             }
 
-            Participant participant = participantDao.findParticipant(request.participantId);
+            Participant participant = participantDao.findParticipant(request.participantID);
             chatDao.updateChat(chat.addParticipant(participant));
             return chat;
         }
     }
 
-    record JoinChatRequest(String chatName, String participantId) {}
+    record JoinChatRequest(String chatName, String participantID) {}
 }

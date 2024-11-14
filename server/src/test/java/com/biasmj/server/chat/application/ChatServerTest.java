@@ -1,6 +1,5 @@
 package com.biasmj.server.chat.application;
 
-import com.biasmj.server.chat.application.ChatServer;
 import com.biasmj.server.chat.domain.type.RequestType;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;

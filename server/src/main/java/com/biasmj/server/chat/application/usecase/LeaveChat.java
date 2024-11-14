@@ -28,10 +28,10 @@ public interface LeaveChat {
 
         @Override
         public Chat execute(LeaveChatRequest request) {
-            logger.log(Level.INFO, String.format("Participant(%s) is leaving chat(%s)", request.participantId, request.chatName));
+            logger.log(Level.INFO, String.format("Participant(%s) is leaving chat(%s)", request.participantID, request.chatName));
 
             Chat chat = chatDao.findChat(request.chatName);
-            Participant participant = participantDao.findParticipant(request.participantId);
+            Participant participant = participantDao.findParticipant(request.participantID);
 
             if (chat.participantOnly()) {
                 logger.log(Level.INFO, String.format("Only one participant left in the chat. Removing chat(%s)", chat.name()));
@@ -49,5 +49,5 @@ public interface LeaveChat {
         }
     }
 
-    record LeaveChatRequest(String chatName, String participantId) {}
+    record LeaveChatRequest(String chatName, String participantID) {}
 }
