@@ -16,8 +16,8 @@ public class ChatServer {
     private static final Logger logger = LoggerFactory.getLogger(ChatServer.class);
     public static final List<Socket> sockets = new ArrayList<>();
 
-    public ChatServer() {
-        try (ServerSocket serverSocket = new ServerSocket(9090)) {
+    public void run() {
+        try (ServerSocket serverSocket = createServerSocket()) {
             while (!serverSocket.isClosed()) {
                 logger.info("Waiting for connection...");
                 try {
@@ -38,5 +38,9 @@ public class ChatServer {
         } catch (IOException e) {
             logger.error("Error starting server", e);
         }
+    }
+
+    protected ServerSocket createServerSocket() throws IOException {
+        return new ServerSocket(9090);
     }
 }

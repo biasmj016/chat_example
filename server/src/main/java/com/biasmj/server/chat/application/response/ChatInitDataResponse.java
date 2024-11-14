@@ -14,10 +14,6 @@ public class ChatInitDataResponse extends MessageType {
         this.chatList = chatList;
     }
 
-    public List<String> getChatList() {
-        return chatList;
-    }
-
     public String toString() {
         String type = super.getTypeName() + ":";
         String chatNames = String.join(",", chatList);

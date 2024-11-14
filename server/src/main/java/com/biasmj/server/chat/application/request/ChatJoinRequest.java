@@ -16,7 +16,4 @@ public class ChatJoinRequest {
         return new JoinChatRequest(chatName, participantId);
     }
 
-    public String getParticipantId() {
-        return participantId;
-    }
 }

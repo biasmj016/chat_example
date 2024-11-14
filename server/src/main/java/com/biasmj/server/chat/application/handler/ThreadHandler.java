@@ -59,7 +59,7 @@ public class ThreadHandler extends Thread {
                 RequestType type = RequestType.valueOf(token[0]);
                 String message = token[1];
                 processReceiveMessage(type, message);
-                Thread.sleep(300);
+                Thread.sleep(3000);
             }
         } catch (Exception e) {
             logger.error("Error in ThreadHandler run method", e);
@@ -74,10 +74,9 @@ public class ThreadHandler extends Thread {
         switch (type) {
             case JOIN -> {
                 LoginParticipantRequest loginReq = new LoginParticipantRequest(socket, message);
-                loginParticipant.execute(loginReq);
+                participant = loginParticipant.execute(loginReq);
                 ChatJoinRequest request = new ChatJoinRequest(message);
                 chat = joinChat.execute(request.toUsecase());
-                participant = findParticipant.find(request.getParticipantId());
                 sendMessage(new ChatMessageResponse(ChatType.JOIN, chat.name(), participant.id(), participant.formatJoinMessage()));
                 sendMessage(new ParticipantInitDataResponse(chat.participants()));
             }
@@ -107,7 +106,13 @@ public class ThreadHandler extends Thread {
     }
 
     public void sendMessage(MessageType message) {
-        try (PrintWriter writer = new PrintWriter(socket.getOutputStream())) {
+        if (socket == null) {
+            logger.error("Socket is null, cannot send message");
+            return;
+        }
+
+        try {
+            PrintWriter writer = new PrintWriter(socket.getOutputStream(), true);
             switch (message.getRequestType()) {
                 case CONNECT -> {
                     ChatInitDataResponse connectInitData = (ChatInitDataResponse) message;
@@ -116,26 +121,23 @@ public class ThreadHandler extends Thread {
                 case JOIN, LEAVE -> {
                     ParticipantInitDataResponse participantInitData = (ParticipantInitDataResponse) message;
                     for (Participant participant : participantInitData.getParticipantList()) {
-                        try (PrintWriter participantWriter = new PrintWriter(participant.socket().getOutputStream())) {
-                            participantWriter.println(participantInitData);
-                        }
+                        PrintWriter participantWriter = new PrintWriter(participant.socket().getOutputStream(), true);
+                        participantWriter.println(participantInitData);
                     }
                 }
                 case CREATE -> {
                     ChatCreateResponse chatCreateResponse = (ChatCreateResponse) message;
                     for (Socket s : ChatServer.sockets) {
-                        try (PrintWriter socketWriter = new PrintWriter(s.getOutputStream())) {
-                            socketWriter.println(chatCreateResponse);
-                        }
+                        PrintWriter socketWriter = new PrintWriter(s.getOutputStream(), true);
+                        socketWriter.println(chatCreateResponse);
                     }
                 }
                 case MESSAGE -> {
                     ChatMessageResponse messageResponse = (ChatMessageResponse) message;
                     Participant participant = findParticipant.find(messageResponse.getParticipantID());
                     if (!Objects.equals(participant.socket(), socket)) {
-                        try (PrintWriter participantWriter = new PrintWriter(participant.socket().getOutputStream())) {
-                            participantWriter.println(messageResponse);
-                        }
+                        PrintWriter participantWriter = new PrintWriter(participant.socket().getOutputStream(), true);
+                        participantWriter.println(messageResponse);
                     }
                 }
             }
