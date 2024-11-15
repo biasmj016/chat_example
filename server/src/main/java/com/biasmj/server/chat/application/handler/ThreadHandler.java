@@ -1,7 +1,6 @@
 package com.biasmj.server.chat.application.handler;
 
 import com.biasmj.server.chat.application.ChatServer;
-import com.biasmj.server.chat.application.usecase.*;
 import com.biasmj.server.chat.application.request.ChatCreateRequest;
 import com.biasmj.server.chat.application.request.ChatJoinRequest;
 import com.biasmj.server.chat.application.request.ChatLeaveRequest;
@@ -10,14 +9,16 @@ import com.biasmj.server.chat.application.response.ChatCreateResponse;
 import com.biasmj.server.chat.application.response.ChatInitDataResponse;
 import com.biasmj.server.chat.application.response.ChatMessageResponse;
 import com.biasmj.server.chat.application.response.ParticipantInitDataResponse;
-import com.biasmj.server.chat.domain.*;
-import com.biasmj.server.chat.domain.type.ChatType;
+import com.biasmj.server.chat.application.usecase.*;
+import com.biasmj.server.chat.domain.Chat;
 import com.biasmj.server.chat.domain.MessageType;
 import com.biasmj.server.chat.domain.type.RequestType;
+import com.biasmj.server.chat.infrastructure.ChatDao;
 import com.biasmj.server.participant.application.usecase.FindParticipant;
 import com.biasmj.server.participant.application.usecase.LoginParticipant;
 import com.biasmj.server.participant.application.usecase.LoginParticipant.LoginParticipantRequest;
 import com.biasmj.server.participant.domain.Participant;
+import com.biasmj.server.participant.infrastructure.ParticipantDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,10 +27,11 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.Objects;
 
 public class ThreadHandler extends Thread {
     private static final Logger logger = LoggerFactory.getLogger(ThreadHandler.class);
+    private static final String WELCOME_MESSAGE = " joined the chat.";
+    private static final String BYE_MESSAGE = " joined the chat.";
     private final Socket socket;
     private final InitChatData initChatData;
     private final FindChat findChat;
@@ -39,15 +41,15 @@ public class ThreadHandler extends Thread {
     private final LeaveChat leaveChat;
     private final LoginParticipant loginParticipant;
 
-    public ThreadHandler(Socket socket) {
+    public ThreadHandler(Socket socket, ChatDao chatDao, ParticipantDao participantDao) {
         this.socket = socket;
-        this.initChatData = new InitChatData.InitChatDataImpl();
-        this.findChat = new FindChat.FindChatImpl();
-        this.findParticipant = new FindParticipant.FindParticipantImpl();
-        this.createChat = new CreateChat.CreateChatImpl();
-        this.joinChat = new JoinChat.JoinChatImpl();
-        this.leaveChat = new LeaveChat.LeaveChatImpl();
-        this.loginParticipant = new LoginParticipant.LoginParticipantImpl();
+        this.initChatData = new InitChatData.InitChatDataImpl(chatDao);
+        this.findChat = new FindChat.FindChatImpl(chatDao);
+        this.findParticipant = new FindParticipant.FindParticipantImpl(participantDao);
+        this.createChat = new CreateChat.CreateChatImpl(chatDao, participantDao);
+        this.joinChat = new JoinChat.JoinChatImpl(chatDao, participantDao);
+        this.leaveChat = new LeaveChat.LeaveChatImpl(chatDao, participantDao);
+        this.loginParticipant = new LoginParticipant.LoginParticipantImpl(participantDao);
     }
 
 
@@ -56,16 +58,14 @@ public class ThreadHandler extends Thread {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
             String str;
             while ((str = reader.readLine()) != null) {
-                String[] token = str.split(":");
+                String[] token = str.split("#");
                 RequestType type = RequestType.valueOf(token[0]);
                 String message = token[1];
                 processReceiveMessage(type, message);
-                Thread.sleep(3000);
+                Thread.sleep(300);
             }
         } catch (Exception e) {
             logger.error("Error in ThreadHandler run method", e);
-        } finally {
-            closeSocket();
         }
     }
 
@@ -78,20 +78,21 @@ public class ThreadHandler extends Thread {
                 participant = loginParticipant.execute(loginReq);
                 ChatJoinRequest request = new ChatJoinRequest(message);
                 chat = joinChat.execute(request.toUsecase());
-                sendMessage(new ChatMessageResponse(ChatType.JOIN, chat.name(), participant.participantID(), participant.formatJoinMessage()));
+                sendMessage(new ChatMessageResponse(chat.name(), participant.participantID(), participant.participantID()+WELCOME_MESSAGE));
                 sendMessage(new ParticipantInitDataResponse(chat.participants()));
             }
             case CREATE -> {
                 ChatCreateRequest chatCreateRequest = new ChatCreateRequest(socket, message);
                 chat = createChat.execute(chatCreateRequest.toUsecase());
-                sendMessage(new ChatCreateResponse(chat.name()));
+                sendMessage(new ChatCreateResponse(chat.name(), chat.managerID()));
+                sendMessage(new ChatMessageResponse(chat.name(), chat.managerID(), chat.managerID()+WELCOME_MESSAGE));
                 sendMessage(new ParticipantInitDataResponse(chat.participants()));
             }
             case LEAVE -> {
                 ChatLeaveRequest chatLeaveRequest = new ChatLeaveRequest(message);
                 chat = findChat.find(chatLeaveRequest.getChatName());
                 participant = findParticipant.find(chatLeaveRequest.getParticipantId());
-                sendMessage(new ChatMessageResponse(ChatType.LEAVE, chatLeaveRequest.getChatName(), chatLeaveRequest.getParticipantId(), participant.formatLeaveMessage()));
+                sendMessage(new ChatMessageResponse(chatLeaveRequest.getChatName(), participant.participantID(), participant.participantID() + BYE_MESSAGE));
                 sendMessage(new ParticipantInitDataResponse(chat.participants()));
                 leaveChat.execute(chatLeaveRequest.toUsecase());
                 sendMessage(new ChatInitDataResponse(initChatData.finds()));
@@ -100,7 +101,7 @@ public class ThreadHandler extends Thread {
                 ChatMessageRequest messageRequest = new ChatMessageRequest(message);
                 chat = findChat.find(messageRequest.getChatName());
                 for (Participant p : chat.participants()) {
-                    sendMessage(new ChatMessageResponse(messageRequest.getType(), messageRequest.getChatName(), messageRequest.getParticipantID(), messageRequest.getMessage()));
+                    sendMessage(new ChatMessageResponse(messageRequest.getChatName(), messageRequest.getParticipantID(), messageRequest.getMessage()));
                 }
             }
         }
@@ -136,10 +137,8 @@ public class ThreadHandler extends Thread {
                 case MESSAGE -> {
                     ChatMessageResponse messageResponse = (ChatMessageResponse) message;
                     Participant participant = findParticipant.find(messageResponse.getParticipantID());
-                    if (!Objects.equals(participant.socket(), socket)) {
-                        PrintWriter participantWriter = new PrintWriter(participant.socket().getOutputStream(), true);
-                        participantWriter.println(messageResponse);
-                    }
+                    PrintWriter participantWriter = new PrintWriter(participant.socket().getOutputStream(), true);
+                    participantWriter.println(messageResponse);
                 }
             }
             writer.flush();

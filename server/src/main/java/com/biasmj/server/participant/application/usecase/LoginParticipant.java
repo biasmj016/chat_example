@@ -14,8 +14,8 @@ public interface LoginParticipant {
         private final ParticipantDao participantDao;
         private static final Logger logger = Logger.getLogger(LoginParticipant.class.getName());
 
-        public LoginParticipantImpl() {
-            this.participantDao = new ParticipantDao.ParticipantDaoImpl();
+        public LoginParticipantImpl(ParticipantDao participantDao) {
+            this.participantDao = participantDao;
         }
 
         @Override

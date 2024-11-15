@@ -11,9 +11,6 @@ public interface InitChatData {
     class InitChatDataImpl implements InitChatData {
         private final ChatDao chatDao;
 
-        public InitChatDataImpl() {
-            this.chatDao = new ChatDao.ChatDaoImpl();
-        }
         public InitChatDataImpl(ChatDao chatDao) {this.chatDao = chatDao;}
 
         @Override

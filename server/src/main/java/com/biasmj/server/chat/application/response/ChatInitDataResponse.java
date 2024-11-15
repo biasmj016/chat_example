@@ -15,7 +15,7 @@ public class ChatInitDataResponse extends MessageType {
     }
 
     public String toString() {
-        String type = super.getTypeName() + ":";
+        String type = super.getTypeName() + "#";
         String chatNames = String.join(",", chatList);
         return chatNames.isEmpty() ? type + "empty" : type + chatNames;
     }

@@ -16,11 +16,6 @@ public interface LeaveChat {
         private final ParticipantDao participantDao;
         private static final Logger logger = Logger.getLogger(LeaveChat.class.getName());
 
-        public LeaveChatImpl() {
-            this.chatDao = new ChatDao.ChatDaoImpl();
-            this.participantDao = new ParticipantDao.ParticipantDaoImpl();
-        }
-
         public LeaveChatImpl(ChatDao chatDao, ParticipantDao participantDao) {
             this.chatDao = chatDao;
             this.participantDao = participantDao;

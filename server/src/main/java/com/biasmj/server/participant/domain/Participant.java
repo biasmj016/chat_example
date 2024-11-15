@@ -12,12 +12,4 @@ public record Participant(
     public Participant(Socket socket, String id, Boolean isManager) {
         this(socket, id, isManager, LocalDateTime.now());
     }
-
-    public String formatJoinMessage() {
-        return participantID + " joined the chat.";
-    }
-
-    public String formatLeaveMessage() {
-        return participantID + " left the chat.";
-    }
 }

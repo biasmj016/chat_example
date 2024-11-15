@@ -16,11 +16,6 @@ public interface CreateChat {
         private final ChatDao chatDao;
         private final ParticipantDao participantDao;
 
-        public CreateChatImpl() {
-            this.chatDao = new ChatDao.ChatDaoImpl();
-            this.participantDao = new ParticipantDao.ParticipantDaoImpl();
-        }
-
         public CreateChatImpl(ChatDao chatDao, ParticipantDao participantDao) {
             this.chatDao = chatDao;
             this.participantDao = participantDao;

@@ -21,7 +21,7 @@ public class ParticipantInitDataResponse extends MessageType {
 
     @Override
     public String toString() {
-        String str = super.getTypeName()+ ":";
+        String str = super.getTypeName()+ "#";
         str += participantList.stream()
                 .map(Participant::participantID)
                 .collect(Collectors.joining(","));

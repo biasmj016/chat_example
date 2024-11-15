@@ -9,9 +9,6 @@ public interface FindChat {
     class FindChatImpl implements FindChat {
         private final ChatDao chatDao;
 
-        public FindChatImpl() {
-            this.chatDao = new ChatDao.ChatDaoImpl();
-        }
         public FindChatImpl(ChatDao chatDao) {this.chatDao = chatDao;}
 
         @Override

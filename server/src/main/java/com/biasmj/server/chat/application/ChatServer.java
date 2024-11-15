@@ -3,6 +3,8 @@ package com.biasmj.server.chat.application;
 import com.biasmj.server.chat.application.usecase.InitChatData;
 import com.biasmj.server.chat.application.handler.ThreadHandler;
 import com.biasmj.server.chat.application.response.ChatInitDataResponse;
+import com.biasmj.server.chat.infrastructure.ChatDao;
+import com.biasmj.server.participant.infrastructure.ParticipantDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,6 +17,13 @@ import java.util.List;
 public class ChatServer {
     private static final Logger logger = LoggerFactory.getLogger(ChatServer.class);
     public static final List<Socket> sockets = new ArrayList<>();
+    private final ChatDao chatDao;
+    private final ParticipantDao participantDao;
+
+    public ChatServer() {
+        this.chatDao = new ChatDao.ChatDaoImpl();
+        this.participantDao = new ParticipantDao.ParticipantDaoImpl();
+    }
 
     public void run() {
         try (ServerSocket serverSocket = createServerSocket()) {
@@ -26,10 +35,10 @@ public class ChatServer {
 
                     sockets.add(socket);
 
-                    ThreadHandler thread = new ThreadHandler(socket);
+                    ThreadHandler thread = new ThreadHandler(socket, chatDao, participantDao);
                     thread.start();
 
-                    InitChatData initChatData = new InitChatData.InitChatDataImpl();
+                    InitChatData initChatData = new InitChatData.InitChatDataImpl(chatDao);
                     thread.sendMessage(new ChatInitDataResponse(initChatData.finds()));
                 } catch (IOException e) {
                     logger.error("Error accepting participant connection", e);

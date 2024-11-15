@@ -16,10 +16,6 @@ public interface JoinChat {
         private final ParticipantDao participantDao;
         private static final Logger logger = Logger.getLogger(JoinChat.class.getName());
 
-        public JoinChatImpl() {
-            this.chatDao = new ChatDao.ChatDaoImpl();
-            this.participantDao = new ParticipantDao.ParticipantDaoImpl();
-        }
         public JoinChatImpl(ChatDao chatDao, ParticipantDao participantDao) {
             this.chatDao = chatDao;
             this.participantDao = participantDao;

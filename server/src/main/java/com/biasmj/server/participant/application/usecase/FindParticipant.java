@@ -9,8 +9,8 @@ public interface FindParticipant {
     class FindParticipantImpl implements FindParticipant {
         private final ParticipantDao participantDao;
 
-        public FindParticipantImpl() {
-            this.participantDao = new ParticipantDao.ParticipantDaoImpl();
+        public FindParticipantImpl(ParticipantDao participantDao) {
+            this.participantDao = participantDao;
         }
 
         @Override

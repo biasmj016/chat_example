@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 public interface ParticipantDao {
-    Participant addParticipant(Participant participant);
+    void addParticipant(Participant participant);
    Participant findParticipant(String participantId);
    boolean isExist(String participantId);
 
@@ -15,9 +15,8 @@ public interface ParticipantDao {
         private final List<Participant> participants = new ArrayList<>();
 
         @Override
-        public Participant addParticipant(Participant participant) {
+        public void addParticipant(Participant participant) {
             participants.add(participant);
-            return participant;
         }
 
         @Override
