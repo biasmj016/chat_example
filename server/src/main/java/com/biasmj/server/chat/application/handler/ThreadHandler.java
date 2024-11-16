@@ -15,8 +15,6 @@ import com.biasmj.server.chat.domain.MessageType;
 import com.biasmj.server.chat.domain.type.RequestType;
 import com.biasmj.server.chat.infrastructure.ChatDao;
 import com.biasmj.server.participant.application.usecase.FindParticipant;
-import com.biasmj.server.participant.application.usecase.LoginParticipant;
-import com.biasmj.server.participant.application.usecase.LoginParticipant.LoginParticipantRequest;
 import com.biasmj.server.participant.domain.Participant;
 import com.biasmj.server.participant.infrastructure.ParticipantDao;
 import org.slf4j.Logger;
@@ -39,7 +37,6 @@ public class ThreadHandler extends Thread {
     private final CreateChat createChat;
     private final JoinChat joinChat;
     private final LeaveChat leaveChat;
-    private final LoginParticipant loginParticipant;
 
     public ThreadHandler(Socket socket, ChatDao chatDao, ParticipantDao participantDao) {
         this.socket = socket;
@@ -49,7 +46,6 @@ public class ThreadHandler extends Thread {
         this.createChat = new CreateChat.CreateChatImpl(chatDao, participantDao);
         this.joinChat = new JoinChat.JoinChatImpl(chatDao, participantDao);
         this.leaveChat = new LeaveChat.LeaveChatImpl(chatDao, participantDao);
-        this.loginParticipant = new LoginParticipant.LoginParticipantImpl(participantDao);
     }
 
 
@@ -74,11 +70,9 @@ public class ThreadHandler extends Thread {
         Participant participant;
         switch (type) {
             case JOIN -> {
-                LoginParticipantRequest loginReq = new LoginParticipantRequest(socket, message);
-                participant = loginParticipant.execute(loginReq);
                 ChatJoinRequest request = new ChatJoinRequest(message);
-                chat = joinChat.execute(request.toUsecase());
-                sendMessage(new ChatMessageResponse(chat.name(), participant.participantID(), participant.participantID()+WELCOME_MESSAGE));
+                chat = joinChat.execute(request.toUsecase(socket));
+                sendMessage(new ChatMessageResponse(chat.name(), request.getParticipantID(), request.getParticipantID()+WELCOME_MESSAGE));
                 sendMessage(new ParticipantInitDataResponse(chat.participants()));
             }
             case CREATE -> {
@@ -99,10 +93,7 @@ public class ThreadHandler extends Thread {
             }
             case MESSAGE -> {
                 ChatMessageRequest messageRequest = new ChatMessageRequest(message);
-                chat = findChat.find(messageRequest.getChatName());
-                for (Participant p : chat.participants()) {
-                    sendMessage(new ChatMessageResponse(messageRequest.getChatName(), messageRequest.getParticipantID(), messageRequest.getMessage()));
-                }
+                sendMessage(new ChatMessageResponse(messageRequest.getChatName(), messageRequest.getParticipantID(), messageRequest.getMessage()));
             }
         }
     }
@@ -136,9 +127,11 @@ public class ThreadHandler extends Thread {
                 }
                 case MESSAGE -> {
                     ChatMessageResponse messageResponse = (ChatMessageResponse) message;
-                    Participant participant = findParticipant.find(messageResponse.getParticipantID());
-                    PrintWriter participantWriter = new PrintWriter(participant.socket().getOutputStream(), true);
-                    participantWriter.println(messageResponse);
+                    Chat chat = findChat.find(messageResponse.getChatName());
+                    for (Participant participant : chat.participants()) {
+                        PrintWriter participantWriter = new PrintWriter(participant.socket().getOutputStream(), true);
+                        participantWriter.println(messageResponse);
+                    }
                 }
             }
             writer.flush();

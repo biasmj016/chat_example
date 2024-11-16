@@ -2,6 +2,8 @@ package com.biasmj.server.chat.application.request;
 
 import com.biasmj.server.chat.application.usecase.JoinChat.JoinChatRequest;
 
+import java.net.Socket;
+
 public class ChatJoinRequest {
     private final String chatName;
     private final String participantID;
@@ -12,8 +14,15 @@ public class ChatJoinRequest {
         this.participantID = message.split(",")[1];
     }
 
-    public JoinChatRequest toUsecase() {
-        return new JoinChatRequest(chatName, participantID);
+    public JoinChatRequest toUsecase(Socket socket) {
+        return new JoinChatRequest(socket, chatName, participantID);
     }
 
+    public String getChatName() {
+        return chatName;
+    }
+
+    public String getParticipantID() {
+        return participantID;
+    }
 }

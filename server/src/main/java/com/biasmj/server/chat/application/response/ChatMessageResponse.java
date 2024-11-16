@@ -24,6 +24,8 @@ public class ChatMessageResponse extends MessageType {
         return participantID;
     }
 
+    public String getChatName() {return chatName;}
+
     @Override
     public String toString() {
         return super.getTypeName()+ "#" +  chatName + "," + participantID + "," + message + "," + regDate;
