@@ -10,7 +10,7 @@ public class ManagerChatIntroGUI extends JFrame {
     private static final String ERROR_ID_REQUIRED = "Manager ID is required.";
     private static final String ERROR_NAME_REQUIRED = "Chat Room Name is required.";
     private static final String ERROR_LIMITS_REQUIRED = "Please select the participant limit.";
-    private static final String ERROR_VALUE_LENGTH = "Please enter 10 characters or fewer.";
+    private static final String ERROR_VALUE_LENGTH = "Please enter 20 characters or fewer.";
 
     private final JPanel connectPanel = new JPanel(new GridBagLayout());
     private final JTextField participantIDText = new JTextField(20);
@@ -44,7 +44,7 @@ public class ManagerChatIntroGUI extends JFrame {
         setComponentProperties(limitsLabel, font, Color.decode("#244667"));
         setComponentProperties(loginButton, font, Color.decode("#244667"), Color.decode("#a1bfdd"));
 
-        for (int i = 1; i <= 10; i++) {
+        for (int i = 2; i <= 10; i++) {
             limitsComboBox.addItem(i);
         }
         limitsComboBox.setFont(font);
@@ -106,8 +106,8 @@ public class ManagerChatIntroGUI extends JFrame {
             if (id.isBlank()) throw new IllegalArgumentException(ERROR_ID_REQUIRED);
             if (chatName.isBlank()) throw new IllegalArgumentException(ERROR_NAME_REQUIRED);
             if (limits == null) throw new IllegalArgumentException(ERROR_LIMITS_REQUIRED);
-            if (id.length() >= 10) throw new IllegalArgumentException(ERROR_VALUE_LENGTH);
-            if (chatName.length() >= 10) throw new IllegalArgumentException(ERROR_VALUE_LENGTH);
+            if (id.length() >= 20) throw new IllegalArgumentException(ERROR_VALUE_LENGTH);
+            if (chatName.length() >= 20) throw new IllegalArgumentException(ERROR_VALUE_LENGTH);
 
             SwingUtilities.invokeLater(() -> new ManagerChatGUI(id, chatName, limits));
 

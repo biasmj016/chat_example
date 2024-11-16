@@ -12,12 +12,14 @@ import java.util.List;
 
 public class ManagerChatGUI extends JFrame {
     private final String participantID;
+    private final String chatName;
     private final JTextField chatField = new JTextField(45);
     private final TextArea chatArea = new TextArea(20, 50);
     private final TextArea participantsArea = new TextArea(10, 50);
 
-    public ManagerChatGUI(String participantID, String chatName, int limits) {
-        this.participantID = participantID;
+    public ManagerChatGUI(String id, String chatName, int limits) {
+        this.participantID = id+"(Manager)";
+        this.chatName = chatName;
         init(participantID, chatName, limits);
         setupFrame();
         setupComponents();
@@ -29,6 +31,7 @@ public class ManagerChatGUI extends JFrame {
     }
 
     private void setupFrame() {
+        updateTitle();
         setSize(600, 700);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -36,7 +39,7 @@ public class ManagerChatGUI extends JFrame {
         setVisible(true);
     }
 
-    public void updateTitle(String chatName) {
+    public void updateTitle() {
         setTitle(chatName);
     }
 

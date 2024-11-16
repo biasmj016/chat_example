@@ -69,9 +69,8 @@ public class MessageReceiver extends Thread {
             }
             case CREATE -> {
                 ChatCreateResponse chatCreateResponse = new ChatCreateResponse(message);
-                ManagerChat.participants = List.of(chatCreateResponse.getChatName());
+                ManagerChat.participants = List.of(chatCreateResponse.getParticipantID());
                 if (ManagerChat.chatGUI != null) {
-                    ManagerChat.chatGUI.updateTitle(chatCreateResponse.getChatName());
                     ManagerChat.chatGUI.setParticipantsArea(ManagerChat.participants);
                 }
             }
