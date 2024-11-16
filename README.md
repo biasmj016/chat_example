@@ -12,3 +12,10 @@ Java와 Spring Boot로 구현한 간단한 채팅 프로그램입니다.
 - Spring Boot
 - Gradle
 - WebSocket
+
+## 실행 방법
+1. 프로젝트를 클론합니다.
+2. server 모듈의 ServerApplication.java를 실행합니다.
+3. manager 모듈의 ManagerApplication.java를 실행합니다.
+4. 실행된 gui에서 채팅방을 생성합니다.
+5. client 모듈의 ClientApplication.java를 실행합니다.
