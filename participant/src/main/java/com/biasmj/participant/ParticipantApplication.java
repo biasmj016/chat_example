@@ -1,13 +1,15 @@
 package com.biasmj.participant;
 
-import org.springframework.boot.SpringApplication;
+import com.biasmj.participant.application.ParticipantChat;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+import java.io.IOException;
 
 @SpringBootApplication
 public class ParticipantApplication {
 
-    public static void main(String[] args) {
-        SpringApplication.run(ParticipantApplication.class, args);
+    public static void main(String[] args) throws IOException {
+        new ParticipantChat();
     }
 
 }
