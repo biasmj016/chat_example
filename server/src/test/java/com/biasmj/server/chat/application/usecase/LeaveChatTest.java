@@ -31,14 +31,12 @@ class LeaveChatTest {
 
         when(chatDao.findChat("chatName")).thenReturn(chat);
         when(participantDao.findParticipant("participantID")).thenReturn(participant);
-        when(chatDao.updateChat(any(Chat.class))).thenReturn(chat);
 
         LeaveChat.LeaveChatRequest request = new LeaveChat.LeaveChatRequest("chatName", "participantID");
-        Chat result = leaveChat.execute(request);
+        leaveChat.execute(request);
 
-        assertNotNull(result);
-        assertEquals(1, result.participants().size());
-        assertEquals("managerID", result.participants().get(0).participantID());
+        assertEquals(1, chat.participants().size());
+        assertEquals("managerID", chat.participants().get(0).participantID());
         verify(chatDao, times(1)).updateChat(any(Chat.class));
     }
 
@@ -51,9 +49,8 @@ class LeaveChatTest {
         when(participantDao.findParticipant("managerID")).thenReturn(manager);
 
         LeaveChat.LeaveChatRequest request = new LeaveChat.LeaveChatRequest("chatName", "managerID");
-        Chat result = leaveChat.execute(request);
+        leaveChat.execute(request);
 
-        assertNull(result);
         verify(chatDao, times(1)).removeChat(any(Chat.class));
     }
 
@@ -66,8 +63,8 @@ class LeaveChatTest {
         when(participantDao.findParticipant("managerID")).thenReturn(manager);
 
         LeaveChat.LeaveChatRequest request = new LeaveChat.LeaveChatRequest("chatName", "managerID");
-        Chat result = leaveChat.execute(request);
+        leaveChat.execute(request);
 
-        assertNull(result);
+        verify(chatDao, times(1)).removeChat(any(Chat.class));
     }
 }

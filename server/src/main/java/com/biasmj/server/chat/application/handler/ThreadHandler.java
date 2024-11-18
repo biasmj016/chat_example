@@ -87,10 +87,10 @@ public class ThreadHandler extends Thread {
                 participant = findParticipant.find(chatLeaveRequest.participantID());
 
                 sendMessage(new ChatMessageResponse(chatLeaveRequest.chatName(), participant.participantID(), participant.participantID() + BYE_MESSAGE));
-                sendMessage(new ParticipantInitDataResponse(chat.participants()));
 
                 leaveChat.execute(chatLeaveRequest);
 
+                sendMessage(new ParticipantInitDataResponse(chat.participants()));
                 sendMessage(new ChatInitDataResponse(initChatData.finds()));
             }
             case MESSAGE -> {
