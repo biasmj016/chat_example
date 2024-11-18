@@ -1,4 +1,4 @@
-package com.biasmj.server.chat.application.response;
+package com.biasmj.server.chat.application.handler.response;
 
 import com.biasmj.server.chat.domain.MessageType;
 import com.biasmj.server.chat.domain.type.RequestType;

@@ -44,5 +44,9 @@ public interface LeaveChat {
         }
     }
 
-    record LeaveChatRequest(String chatName, String participantID) {}
+    record LeaveChatRequest(String chatName, String participantID) {
+        public LeaveChatRequest(String message) {
+            this(message.split(",")[0], message.split(",")[1]);
+        }
+    }
 }

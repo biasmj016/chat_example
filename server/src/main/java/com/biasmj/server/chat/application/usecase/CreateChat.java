@@ -42,5 +42,9 @@ public interface CreateChat {
         }
     }
 
-    record CreateChatRequest(Socket socket, String name, String managerID, int limits) {}
+    record CreateChatRequest(Socket socket, String name, String managerID, int limits) {
+        public CreateChatRequest(Socket socket, String message) {
+            this(socket, message.split(",")[0], message.split(",")[1], Integer.parseInt(message.split(",")[2]));
+        }
+    }
 }

@@ -1,4 +1,4 @@
-package com.biasmj.server.chat.application.request;
+package com.biasmj.server.chat.application.handler.request;
 
 public class ChatMessageRequest {
     private final String chatName;

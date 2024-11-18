@@ -46,5 +46,9 @@ public interface JoinChat {
         }
     }
 
-    record JoinChatRequest(Socket socket, String chatName, String participantID) {}
+    record JoinChatRequest(Socket socket, String chatName, String participantID) {
+        public JoinChatRequest(Socket socket, String message) {
+            this(socket, message.split(",")[0], message.split(",")[1]);
+        }
+    }
 }

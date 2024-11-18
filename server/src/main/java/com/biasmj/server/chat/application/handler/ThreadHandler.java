@@ -1,15 +1,15 @@
 package com.biasmj.server.chat.application.handler;
 
-import com.biasmj.server.chat.application.ChatServer;
-import com.biasmj.server.chat.application.request.ChatCreateRequest;
-import com.biasmj.server.chat.application.request.ChatJoinRequest;
-import com.biasmj.server.chat.application.request.ChatLeaveRequest;
-import com.biasmj.server.chat.application.request.ChatMessageRequest;
-import com.biasmj.server.chat.application.response.ChatCreateResponse;
-import com.biasmj.server.chat.application.response.ChatInitDataResponse;
-import com.biasmj.server.chat.application.response.ChatMessageResponse;
-import com.biasmj.server.chat.application.response.ParticipantInitDataResponse;
+import com.biasmj.server.chat.application.service.ChatServer;
+import com.biasmj.server.chat.application.handler.request.ChatMessageRequest;
+import com.biasmj.server.chat.application.handler.response.ChatCreateResponse;
+import com.biasmj.server.chat.application.handler.response.ChatInitDataResponse;
+import com.biasmj.server.chat.application.handler.response.ChatMessageResponse;
+import com.biasmj.server.chat.application.handler.response.ParticipantInitDataResponse;
 import com.biasmj.server.chat.application.usecase.*;
+import com.biasmj.server.chat.application.usecase.CreateChat.CreateChatRequest;
+import com.biasmj.server.chat.application.usecase.JoinChat.JoinChatRequest;
+import com.biasmj.server.chat.application.usecase.LeaveChat.LeaveChatRequest;
 import com.biasmj.server.chat.domain.Chat;
 import com.biasmj.server.chat.domain.MessageType;
 import com.biasmj.server.chat.domain.type.RequestType;
@@ -29,7 +29,7 @@ import java.net.Socket;
 public class ThreadHandler extends Thread {
     private static final Logger logger = LoggerFactory.getLogger(ThreadHandler.class);
     private static final String WELCOME_MESSAGE = " joined the chat.";
-    private static final String BYE_MESSAGE = " joined the chat.";
+    private static final String BYE_MESSAGE = " left the chat.";
     private final Socket socket;
     private final InitChatData initChatData;
     private final FindChat findChat;
@@ -70,25 +70,27 @@ public class ThreadHandler extends Thread {
         Participant participant;
         switch (type) {
             case JOIN -> {
-                ChatJoinRequest request = new ChatJoinRequest(message);
-                chat = joinChat.execute(request.toUsecase(socket));
-                sendMessage(new ChatMessageResponse(chat.name(), request.getParticipantID(), request.getParticipantID()+WELCOME_MESSAGE));
+                JoinChatRequest request = new JoinChatRequest(socket, message);
+                chat = joinChat.execute(new JoinChatRequest(socket, message));
+                sendMessage(new ChatMessageResponse(chat.name(), request.participantID(), request.participantID()+WELCOME_MESSAGE));
                 sendMessage(new ParticipantInitDataResponse(chat.participants()));
             }
             case CREATE -> {
-                ChatCreateRequest chatCreateRequest = new ChatCreateRequest(socket, message);
-                chat = createChat.execute(chatCreateRequest.toUsecase());
+                chat = createChat.execute(new CreateChatRequest(socket, message));
                 sendMessage(new ChatCreateResponse(chat.name(), chat.managerID()));
                 sendMessage(new ChatMessageResponse(chat.name(), chat.managerID(), chat.managerID()+WELCOME_MESSAGE));
                 sendMessage(new ParticipantInitDataResponse(chat.participants()));
             }
             case LEAVE -> {
-                ChatLeaveRequest chatLeaveRequest = new ChatLeaveRequest(message);
-                chat = findChat.find(chatLeaveRequest.getChatName());
-                participant = findParticipant.find(chatLeaveRequest.getParticipantId());
-                sendMessage(new ChatMessageResponse(chatLeaveRequest.getChatName(), participant.participantID(), participant.participantID() + BYE_MESSAGE));
+                LeaveChatRequest chatLeaveRequest = new LeaveChatRequest(message);
+                chat = findChat.find(chatLeaveRequest.chatName());
+                participant = findParticipant.find(chatLeaveRequest.participantID());
+
+                sendMessage(new ChatMessageResponse(chatLeaveRequest.chatName(), participant.participantID(), participant.participantID() + BYE_MESSAGE));
                 sendMessage(new ParticipantInitDataResponse(chat.participants()));
-                leaveChat.execute(chatLeaveRequest.toUsecase());
+
+                leaveChat.execute(chatLeaveRequest);
+
                 sendMessage(new ChatInitDataResponse(initChatData.finds()));
             }
             case MESSAGE -> {

@@ -1,8 +1,8 @@
-package com.biasmj.server.chat.application;
+package com.biasmj.server.chat.application.service;
 
 import com.biasmj.server.chat.application.usecase.InitChatData;
 import com.biasmj.server.chat.application.handler.ThreadHandler;
-import com.biasmj.server.chat.application.response.ChatInitDataResponse;
+import com.biasmj.server.chat.application.handler.response.ChatInitDataResponse;
 import com.biasmj.server.chat.infrastructure.ChatDao;
 import com.biasmj.server.participant.infrastructure.ParticipantDao;
 import org.slf4j.Logger;
