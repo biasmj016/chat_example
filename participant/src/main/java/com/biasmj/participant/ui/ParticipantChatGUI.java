@@ -1,13 +1,13 @@
 package com.biasmj.participant.ui;
 
+import com.biasmj.participant.network.request.ChatLeaveRequest;
 import com.biasmj.participant.network.request.ChatMessageRequest;
 import com.biasmj.participant.application.ParticipantChat;
 import com.biasmj.participant.network.request.ChatJoinRequest;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
+import java.awt.event.*;
 import java.util.List;
 
 public class ParticipantChatGUI extends JFrame {
@@ -16,6 +16,7 @@ public class ParticipantChatGUI extends JFrame {
     private final JTextField chatField = new JTextField(45);
     private final TextArea chatArea = new TextArea(20, 50);
     private final TextArea participantsArea = new TextArea(10, 50);
+    private final JButton leaveButton = new JButton("Leave");
 
     public ParticipantChatGUI(String participantID, String chatName) {
         this.participantID = participantID;
@@ -60,7 +61,28 @@ public class ParticipantChatGUI extends JFrame {
 
         mainPanel.add(createLabeledPanel("Participants", participantsArea), BorderLayout.NORTH);
         mainPanel.add(createLabeledPanel("Chat", chatArea), BorderLayout.CENTER);
-        mainPanel.add(createInputPanel(), BorderLayout.SOUTH);
+
+        leaveButton.setForeground(Color.decode("#244667"));
+        leaveButton.setBackground(Color.decode("#a1bfdd"));
+
+        JPanel inputPanel = new JPanel();
+        inputPanel.setLayout(new BoxLayout(inputPanel, BoxLayout.Y_AXIS));
+        inputPanel.add(chatField);
+
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        buttonPanel.add(leaveButton);
+        inputPanel.add(buttonPanel);
+
+        chatField.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) sendMessage();
+            }
+        });
+
+        mainPanel.add(inputPanel, BorderLayout.SOUTH);
+
+        leaveButton.addActionListener(this::leave);
 
         add(mainPanel);
     }
@@ -72,18 +94,6 @@ public class ParticipantChatGUI extends JFrame {
         return panel;
     }
 
-    private JPanel createInputPanel() {
-        JPanel inputPanel = new JPanel();
-        inputPanel.add(chatField);
-        chatField.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyPressed(KeyEvent e) {
-                if (e.getKeyCode() == KeyEvent.VK_ENTER) sendMessage();
-            }
-        });
-        return inputPanel;
-    }
-
     private void sendMessage() {
         String message = chatField.getText().trim();
         if (message.isEmpty()) return;
@@ -91,5 +101,12 @@ public class ParticipantChatGUI extends JFrame {
         ChatMessageRequest messageRequest = new ChatMessageRequest(getTitle(), participantID, message);
         ParticipantChat.sender.sendMessage(messageRequest);
         chatField.setText(null);
+    }
+
+    private void leave(ActionEvent e) {
+        ChatLeaveRequest messageRequest = new ChatLeaveRequest(getTitle(), participantID);
+        ParticipantChat.sender.sendMessage(messageRequest);
+
+        dispose();
     }
 }
