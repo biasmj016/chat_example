@@ -21,14 +21,14 @@ public class ManagerChatGUI extends JFrame {
     private final JButton leaveButton = new JButton("Leave");
 
     public ManagerChatGUI(String id, String chatName, int limits) {
-        this.participantID = id+"(Manager)";
-        this.chatName = chatName;
-        init(participantID, chatName, limits);
+        this.participantID = replace(id)+"(Manager)";
+        this.chatName = replace(chatName);
+        init(limits);
         setupFrame();
         setupComponents();
     }
 
-    private void init(String participantID, String chatName, int limits) {
+    private void init(int limits) {
         ManagerChat.chatGUI = this;
         ManagerChat.sender.sendMessage(new ChatCreateRequest(chatName, participantID, limits));
     }
@@ -96,23 +96,11 @@ public class ManagerChatGUI extends JFrame {
         return panel;
     }
 
-    private JPanel createInputPanel() {
-        JPanel inputPanel = new JPanel();
-        inputPanel.add(chatField);
-        chatField.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyPressed(KeyEvent e) {
-                if (e.getKeyCode() == KeyEvent.VK_ENTER) sendMessage();
-            }
-        });
-        return inputPanel;
-    }
-
     private void sendMessage() {
         String message = chatField.getText().trim();
         if (message.isEmpty()) return;
 
-        ChatMessageRequest messageRequest = new ChatMessageRequest(getTitle(), participantID, message);
+        ChatMessageRequest messageRequest = new ChatMessageRequest(getTitle(), participantID, replace(message));
         ManagerChat.sender.sendMessage(messageRequest);
         chatField.setText(null);
     }
@@ -122,5 +110,10 @@ public class ManagerChatGUI extends JFrame {
         ManagerChat.sender.sendMessage(messageRequest);
 
         dispose();
+    }
+
+    private String replace(String str) {
+        if(str == null || str.isBlank()) return str;
+        return str.replaceAll(",", "").replaceAll("#", "");
     }
 }

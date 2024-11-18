@@ -19,8 +19,8 @@ public class ParticipantChatGUI extends JFrame {
     private final JButton leaveButton = new JButton("Leave");
 
     public ParticipantChatGUI(String participantID, String chatName) {
-        this.participantID = participantID;
-        this.chatName = chatName;
+        this.participantID = replace(participantID);
+        this.chatName = replace(chatName);
         init();
         setupFrame();
         setupComponents();
@@ -98,7 +98,7 @@ public class ParticipantChatGUI extends JFrame {
         String message = chatField.getText().trim();
         if (message.isEmpty()) return;
 
-        ChatMessageRequest messageRequest = new ChatMessageRequest(getTitle(), participantID, message);
+        ChatMessageRequest messageRequest = new ChatMessageRequest(getTitle(), participantID, replace(message));
         ParticipantChat.sender.sendMessage(messageRequest);
         chatField.setText(null);
     }
@@ -108,5 +108,10 @@ public class ParticipantChatGUI extends JFrame {
         ParticipantChat.sender.sendMessage(messageRequest);
 
         dispose();
+    }
+
+    private String replace(String str) {
+        if(str == null || str.isBlank()) return str;
+        return str.replaceAll(",", "").replaceAll("#", "");
     }
 }

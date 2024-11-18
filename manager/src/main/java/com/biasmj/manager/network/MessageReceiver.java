@@ -39,7 +39,7 @@ public class MessageReceiver extends Thread {
                 RequestType type = RequestType.valueOf(token[0]);
                 String message = token[1];
 
-                processReceivedMessage(type, message);
+                receiveMessage(type, message);
 
                 Thread.sleep(300);
             }
@@ -50,6 +50,9 @@ public class MessageReceiver extends Thread {
     }
 
     private void closeSocket() {
+        ManagerChat.chatList.add("Error in communication");
+        if (ManagerChat.chatGUI != null) ManagerChat.chatGUI.setChatArea(ManagerChat.chatList);
+
         try {
             socket.close();
             logger.info("Socket closed");
@@ -58,7 +61,7 @@ public class MessageReceiver extends Thread {
         }
     }
 
-    private void processReceivedMessage(RequestType type, String message) {
+    private void receiveMessage(RequestType type, String message) {
         logger.info(message);
 
         switch (type) {
