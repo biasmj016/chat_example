@@ -1,6 +1,5 @@
 package com.biasmj.manager.application;
 
-import com.biasmj.manager.domain.Participant;
 import com.biasmj.manager.network.MessageReceiver;
 import com.biasmj.manager.network.MessageSender;
 import com.biasmj.manager.ui.ManagerChatGUI;
